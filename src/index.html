@@ -1,0 +1,446 @@
+<!doctype html>
+<html lang="de">
+  <head>
+    <meta charset="utf-8" />
+    <meta lang="en" />
+
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <meta name="description" content="QiFi - WiFi QR Code Generator Desktop" />
+
+    <meta name="author" content="Evgeni Golov" />
+
+    <title>QiFi - WiFi QR Code Generator</title>
+
+    <!-- Local Electron CSS -->
+
+    <link rel="stylesheet" type="text/css" href="./style.css" />
+
+    <link rel="stylesheet" type="text/css" media="print" href="./print.css" />
+
+    <link rel="icon" href="./qifi.png" type="image/png" />
+
+    <link
+      rel="stylesheet"
+      type="text/css"
+      href="./bootstrap/dist/css/bootstrap.min.css"
+    />
+
+    <style>
+      body {
+        padding-top: 60px;
+      }
+    </style>
+  </head>
+
+  <body>
+    <nav class="navbar navbar-inverse navbar-fixed-top">
+      <div class="container">
+        <div class="navbar-header">
+          <button
+            type="button"
+            class="navbar-toggle collapsed"
+            data-toggle="collapse"
+            data-target="#navbar"
+            aria-expanded="false"
+          >
+            <span class="sr-only"> Toggle navigation </span>
+
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+          </button>
+
+          <a class="navbar-brand" href="#"> QiFi </a>
+        </div>
+
+        <div id="navbar" class="collapse navbar-collapse">
+          <ul class="nav navbar-nav">
+            <li>
+              <a href="#about"> About </a>
+            </li>
+
+            <li>
+              <a href="#contact"> Contact </a>
+            </li>
+
+            <li id="history-drop" class="dropdown">
+              <a
+                href="#"
+                role="button"
+                class="dropdown-toggle"
+                data-toggle="dropdown"
+              >
+                History
+
+                <b class="caret"></b>
+              </a>
+
+              <ul class="dropdown-menu" role="menu"></ul>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </nav>
+
+    <div class="container">
+      <section id="generator">
+        <div class="page-header">
+          <h1 id="title">QiFi WiFi QR Code Generator</h1>
+        </div>
+
+        <div id="history"></div>
+
+        <form id="form">
+          <div class="form-group has-feedback">
+            <label for="ssid" class="control-label"> SSID </label>
+
+            <div class="input-group">
+              <span id="basic-addon-ssid" class="input-group-addon">
+                <i class="glyphicon glyphicon-signal"></i>
+              </span>
+
+              <input
+                type="text"
+                id="ssid"
+                name="ssid"
+                class="form-control"
+                placeholder="SSID"
+                required
+              />
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="enc" class="control-label"> Encryption </label>
+
+            <select name="enc" id="enc" class="form-control">
+              <option value="WPA">WPA/WPA2/WPA3</option>
+
+              <option value="WEP">WEP</option>
+
+              <option value="nopass">None</option>
+            </select>
+          </div>
+
+          <div class="form-group has-feedback" id="key-p">
+            <label class="control-label"> Key </label>
+
+            <div class="input-group">
+              <span class="input-group-addon">
+                <i class="glyphicon glyphicon-lock"></i>
+              </span>
+
+              <input
+                type="password"
+                id="key"
+                name="key"
+                class="form-control"
+                placeholder="key"
+              />
+
+              <span class="input-group-btn">
+                <button class="btn btn-default" type="button" id="display-key">
+                  <i
+                    class="glyphicon glyphicon-eye-open"
+                    id="display-key-icon"
+                  ></i>
+                </button>
+              </span>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="pull-left control-label" for="hidden"> Hidden </label>
+
+            <div class="input-group">
+              <input
+                type="checkbox"
+                id="hidden"
+                name="hidden"
+                data-toggle="tooltip"
+                title="Is your SSID hidden?"
+              />
+            </div>
+          </div>
+
+          <div class="form-group">
+            <button id="generate" class="btn btn-primary">Generate!</button>
+
+            <button
+              id="save"
+              type="button"
+              class="btn"
+              data-toggle="tooltip"
+              title="Save credentials locally"
+            >
+              Save!
+            </button>
+
+            <a
+              href="#"
+              id="export"
+              class="btn"
+              data-toggle="tooltip"
+              title="Export QR code"
+            >
+              Export!
+            </a>
+
+            <a
+              href="javascript:window.print()"
+              id="print"
+              class="btn"
+              data-toggle="tooltip"
+              title="Print QR code"
+            >
+              Print!
+            </a>
+          </div>
+        </form>
+
+        <h1 id="showssid">SSID: none</h1>
+
+        <h1 id="showkey">Passphrase: none</h1>
+
+        <div id="qrcode"></div>
+      </section>
+
+      <section id="about">
+        <div class="page-header">
+          <h1 class="anchor">About</h1>
+        </div>
+
+        <p>
+          QiFi generates WiFi QR codes completely locally. No network
+          transmission is required. The application runs inside Electron and
+          keeps your WiFi credentials on your machine.
+        </p>
+
+        <p>Saved networks are stored locally using HTML5 localStorage.</p>
+
+        <p>
+          WiFi QR format:
+
+          <code>
+            WIFI:S:&lt;SSID&gt;;T:&lt;WPA|WEP|nopass&gt;;P:&lt;password&gt;;
+          </code>
+        </p>
+      </section>
+
+      <section id="contact">
+        <div class="page-header">
+          <h1 class="anchor">Contact</h1>
+        </div>
+
+        <p>
+          Original QiFi project by
+          <a href="https://github.com/evgeni"> @evgeni </a>
+        </p>
+      </section>
+    </div>
+
+    <footer class="footer">
+      <div class="container">
+        <img src="./qifi-small.png" alt="qifi logo" />
+
+        QiFi Desktop Edition
+
+        <br />
+
+        <span style="color: #999999">
+          QR Code is a registered trademark of DENSO WAVE INCORPORATED.
+        </span>
+      </div>
+    </footer>
+
+    <!-- Electron local libraries -->
+
+    <script src="./jquery/jquery-3.5.1.slim.min.js"></script>
+
+    <script src="./bootstrap/dist/js/bootstrap.min.js"></script>
+
+    <script src="./jquery-qrcode/jquery.qrcode.min.js"></script>
+
+    <script src="./jquery.storage/jquery.storage.js"></script>
+
+    <script>
+      function escape_string(string) {
+        var to_escape = ["\\", ";", ",", ":", '"'];
+
+        var output = "";
+
+        for (var i = 0; i < string.length; i++) {
+          if ($.inArray(string[i], to_escape) != -1) {
+            output += "\\" + string[i];
+          } else {
+            output += string[i];
+          }
+        }
+
+        return output;
+      }
+
+      function generate() {
+        var ssid = $("#ssid").val();
+
+        var hidden = $("#hidden").is(":checked");
+
+        var enc = $("#enc").val();
+
+        var key = "";
+
+        if (enc != "nopass") {
+          key = $("#key").val();
+
+          $("#showkey").text(enc + " Passphrase: " + key);
+        } else {
+          $("#showkey").text("");
+        }
+
+        var qrstring =
+          "WIFI:S:" +
+          escape_string(ssid) +
+          ";T:" +
+          enc +
+          ";P:" +
+          escape_string(key) +
+          ";";
+
+        if (hidden) {
+          qrstring += "H:true";
+        }
+
+        qrstring += ";";
+
+        $("#qrcode").empty();
+
+        $("#qrcode").qrcode(qrstring);
+
+        $("#showssid").text("SSID: " + ssid);
+
+        $("#save").show();
+
+        $("#print").css("display", "inline-block");
+
+        var canvas = $("#qrcode canvas");
+
+        if (canvas.length === 1) {
+          var data = canvas[0].toDataURL("image/png");
+
+          $("#export").attr("href", data);
+
+          $("#export").attr("download", ssid + "-qrcode.png");
+
+          $("#export").css("display", "inline-block");
+        }
+      }
+
+      function save() {
+        var ssid = $("#ssid").val();
+
+        if (!ssid) return;
+
+        var storage = $.localStorage("qificodes");
+
+        if (!storage) storage = {};
+
+        storage[ssid] = {
+          hidden: $("#hidden").is(":checked"),
+
+          enc: $("#enc").val(),
+
+          key: $("#key").val(),
+        };
+
+        $.localStorage("qificodes", storage);
+
+        loadhistory();
+      }
+
+      function load(ssid) {
+        var storage = $.localStorage("qificodes");
+
+        if (storage && storage[ssid]) {
+          $("#ssid").val(ssid);
+
+          $("#enc").val(storage[ssid].enc);
+
+          $("#key").val(storage[ssid].key);
+
+          $("#hidden").prop("checked", storage[ssid].hidden);
+
+          generate();
+        }
+      }
+
+      function loadhistory() {
+        var storage = $.localStorage("qificodes");
+
+        if (storage) {
+          var history = $("#history-drop ul.dropdown-menu");
+
+          history.empty();
+
+          Object.keys(storage).forEach(function (ssid) {
+            history.append(
+              "<li>" +
+                '<a href="#" class="history-item">' +
+                ssid +
+                "</a>" +
+                "</li>",
+            );
+          });
+
+          $("#history-drop").show();
+
+          $(".history-item").click(function (e) {
+            e.preventDefault();
+
+            load($(this).text());
+          });
+        }
+      }
+
+      $(document).ready(function () {
+        $("#form").submit(function () {
+          generate();
+
+          return false;
+        });
+
+        $("#save").click(save);
+
+        $("#display-key").click(function () {
+          var key = $("#key");
+
+          if (key.attr("type") === "password") {
+            key.attr("type", "text");
+          } else {
+            key.attr("type", "password");
+          }
+        });
+
+        $("#enc").change(function () {
+          if ($(this).val() !== "nopass") {
+            $("#key-p").show();
+
+            $("#key").attr("required", "required");
+          } else {
+            $("#key-p").hide();
+
+            $("#key").removeAttr("required");
+          }
+        });
+
+        $("#form").tooltip({
+          selector: "[data-toggle=tooltip]",
+        });
+
+        loadhistory();
+      });
+    </script>
+  </body>
+</html>
