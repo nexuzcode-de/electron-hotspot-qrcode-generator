@@ -1,0 +1,1 @@
+# electron-hotspot-qrcode-generator
