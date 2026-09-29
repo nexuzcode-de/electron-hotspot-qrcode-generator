@@ -24,7 +24,7 @@
     "@electron-forge/publisher-github": "^7.11.2",
     "@electron/packager": "^20.0.2",
     "babel-loader": "^10.1.1",
-    "electron": "^43.1.0",
+    "electron": "^43.5.0",
     "electron-builder": "^26.15.3",
     "electron-devtools-installer": "^4.0.0",
     "electron-installer-zip": "^0.1.2",
